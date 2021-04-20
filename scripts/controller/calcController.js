@@ -25,10 +25,12 @@ class calcController {
 
     }
 
+    // limpa a calculadora
     allClear() {
         this._operation = [];
     }
 
+    // limpa a última entrada
     cancelEntry() {
         this._operation.pop();
     }
@@ -37,12 +39,45 @@ class calcController {
         this.displayCalc = "ERROR";
     }
 
+    // pega o último item o array
     getlastOperation() {
         return this._operation[this._operation.length-1];
     }
 
+    // troca o último valor inserido
     setLastOperation(value) {
         this._operation[this._operation.length-1] = value;
+    }
+
+    // adiciona um valor no array 
+    pushOperation(value){
+        this._operation.push(value);
+
+        if(this._operation.length > 3) {
+            this.calc();
+        }
+    }
+
+    calc() {
+        const last = this._operation.pop();
+        const result = eval(this._operation.join(''));
+
+        this._operation = [result, last];
+
+        this.setLastNumberToDisplay();
+    }
+
+    setLastNumberToDisplay() {
+        let lastNumber;
+
+        for(let i = this._operation.length-1; i >= 0; i--) {
+            if(!this.isOperator(this._operation[i])) {
+                lastNumber = this._operation[i];
+                break;
+            }
+        }
+
+        this.displayCalc = lastNumber;
     }
 
     // retorna através do indexOf a posição do array de sinais abaixo
@@ -55,26 +90,37 @@ class calcController {
 
     addOperation(value) {
 
-        // const lastOperation = this._operation[this._operation.length-1];
-        console.log(isNaN(this.getlastOperation()));
         if(isNaN(this.getlastOperation())) {
             
             if(this.isOperator(value)) {
+
                 this.setLastOperation(value);
+            
             }else if(isNaN(value)){
 
             }else {
-                this._operation.push(value);
+
+                this.pushOperation(value);
+                this.setLastNumberToDisplay()
+            
             }
 
         }else {
-            const newValue = this.getlastOperation().toString() + value.toString();
-            this.setLastOperation(newValue);
+
+            if(this.isOperator(value)) {
+
+                this.pushOperation(value);
+            
+            }else {
+
+                const newValue = this.getlastOperation().toString() + value.toString();
+                this.setLastOperation(parseInt(newValue));
+                this.setLastNumberToDisplay()
+            
+            }
+
         }
 
-        // this._operation.push(value);
-
-        console.log(this._operation);
     }
 
     execButton(value) {
